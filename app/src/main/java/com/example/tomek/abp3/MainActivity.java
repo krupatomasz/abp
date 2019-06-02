@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import java.util.Random;
 
-
 public class MainActivity extends AppCompatActivity {
 
     EditText username_ET = null;
@@ -43,6 +42,37 @@ public class MainActivity extends AppCompatActivity {
                 new Generate().execute(username, password);
             }
         });
+    }
+
+    private class Sensor {
+        public double temperature;
+        public double humidity;
+        public double weight;
+
+        public Sensor() {
+            Random random = new Random();
+            temperature = random.nextDouble() * 10 + 10;
+            humidity = random.nextDouble() * 25 + 50;
+            weight = random.nextDouble() * 5000;
+        }
+
+        public void update() {
+            if (weight > 5000)
+                weight = 0;
+            if (temperature > 20)
+                temperature -= 2;
+            if (temperature < 10)
+                temperature += 2;
+            if (humidity > 75)
+                humidity -= 5;
+            if (humidity < 50)
+                humidity += 5;
+
+            Random random = new Random();
+            temperature += random.nextDouble() / 5 - 0.1; // -0.1 to +0.1
+            humidity += random.nextDouble() / 2 - 0.25; // -0.25 to +0.25
+            weight += random.nextDouble() * 30;
+        }
     }
 
     private class Generate extends AsyncTask<String, Void, Integer> {
@@ -87,21 +117,21 @@ public class MainActivity extends AppCompatActivity {
 
             try {
                 final int sensor_count = 5;
+                Sensor[] sensors = new Sensor[sensor_count];
+                for (int i = 0; i < sensors.length; ++i)
+                    sensors[i] = new Sensor();
 
                 Random random = new Random();
                 System.out.println("Start");
                 while (true) {
-                    int sensorNum = random.nextInt(sensor_count) + 1;
-                    double temperature = random.nextDouble() * 10 + 10;
-                    double humidity = random.nextDouble() * 100;
-                    double weight = random.nextDouble() * 5000;
-                    String message = "s=" + sensorNum;
+                    int sensorNum = random.nextInt(sensor_count);
+                    String message = "s=" + (sensorNum + 1);
                     message += "&time=" + System.currentTimeMillis();
-                    message += "&t=" + temperature;
-                    message += "&h=" + humidity;
-                    message += "&w=" + weight;
-
+                    message += "&t=" + sensors[sensorNum].temperature;
+                    message += "&h=" + sensors[sensorNum].humidity;
+                    message += "&w=" + sensors[sensorNum].weight;
                     channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
+                    sensors[sensorNum].update();
                     Thread.sleep(10);
                 }
             } catch (IOException e) {
