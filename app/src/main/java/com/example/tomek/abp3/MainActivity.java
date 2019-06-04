@@ -18,15 +18,18 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
+    EditText number_ET = null;
     EditText username_ET = null;
     EditText password_ET = null;
     Button OK_button = null;
+    String sensor_num;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        number_ET = (EditText) findViewById(R.id.number_ET);
         username_ET = (EditText) findViewById(R.id.username_ET);
         password_ET = (EditText) findViewById(R.id.password_ET);
         OK_button = (Button) findViewById(R.id.OK_button);
@@ -36,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String username = username_ET.getText().toString();
                 String password = password_ET.getText().toString();
+                sensor_num = number_ET.getText().toString();
+                number_ET.setText("");
                 username_ET.setText("");
                 password_ET.setText("");
                 OK_button.setEnabled(false);
@@ -116,22 +121,17 @@ public class MainActivity extends AppCompatActivity {
             }
 
             try {
-                final int sensor_count = 5;
-                Sensor[] sensors = new Sensor[sensor_count];
-                for (int i = 0; i < sensors.length; ++i)
-                    sensors[i] = new Sensor();
+                Sensor sensor = new Sensor();
 
-                Random random = new Random();
                 System.out.println("Start");
                 while (true) {
-                    int sensorNum = random.nextInt(sensor_count);
-                    String message = "s=" + (sensorNum + 1);
+                    String message = "s=" + sensor_num;
                     message += "&time=" + System.currentTimeMillis();
-                    message += "&t=" + sensors[sensorNum].temperature;
-                    message += "&h=" + sensors[sensorNum].humidity;
-                    message += "&w=" + sensors[sensorNum].weight;
+                    message += "&t=" + sensor.temperature;
+                    message += "&h=" + sensor.humidity;
+                    message += "&w=" + sensor.weight;
                     channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
-                    sensors[sensorNum].update();
+                    sensor.update();
                     Thread.sleep(10);
                 }
             } catch (IOException e) {

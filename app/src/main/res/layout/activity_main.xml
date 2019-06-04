@@ -7,6 +7,19 @@
     tools:context=".MainActivity">
 
     <EditText
+        android:id="@+id/number_ET"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:ems="10"
+        android:hint="Sensor#"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/username_ET"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
         android:id="@+id/password_ET"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
